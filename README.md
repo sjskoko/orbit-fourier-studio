@@ -26,7 +26,7 @@ Draw a path or upload an image, refine its contour, and animate it with up to 5,
 - Playback, scrubbing, speed, colors, fullscreen, PNG snapshots, complete SVG paths and JSON project files.
 - **Video export:** 9:16 story, 1:1 square or 16:9 landscape; 720p/1080p; 6/15/30 seconds; MP4 when available, with a clearly labeled WebM fallback.
 - **Story landing page:** a ready-to-share MP4, mobile layout, file sharing, link copying and Instagram Link sticker instructions.
-- All image and sketch processing happens locally. There are no analytics, image-upload endpoints, API keys or runtime dependencies.
+- All image and sketch processing happens locally. There are no image-upload endpoints or runtime library dependencies. Optional aggregate page-view analytics are documented in the traffic section below.
 
 ## Explore the shape library
 
@@ -180,3 +180,11 @@ Images are decoded and processed in the browser. The app does not transmit their
 Version 1.2 also stops redundant redraws while paused or hidden, caps live painting at 30 fps, removes duplicate chain endpoint calculations, blocks stale contour application immediately when extraction settings change, improves mobile tap targets, and fits SVG exports to their actual bounds. See [the quality review](docs/quality-review.md) for validation and remaining opportunities.
 
 The optional `scripts/render-story.cjs` production tool requires `@napi-rs/canvas`, FFmpeg and the DejaVu fonts referenced in the script. It is not part of the dependency-free website or CI.
+
+## GitHub Pages traffic
+
+<!-- LIVE-TRAFFIC:START -->
+![Traffic tracking setup status](assets/traffic-status.svg)
+
+**Not active yet:** collector registration is blocked by a hosting-service error. The endpoint is deliberately empty. [Implementation and activation instructions](https://github.com/sjskoko/lab/tree/main/analytics).
+<!-- LIVE-TRAFFIC:END -->
