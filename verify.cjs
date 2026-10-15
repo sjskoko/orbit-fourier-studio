@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),F=require('./dist/math.js');
+const n=128,p=Array.from({length:n},(_,i)=>({x:Math.cos(2*Math.PI*i/n),y:Math.sin(2*Math.PI*i/n)}));
+const c=F.dft(p),one=F.select(c,3);assert(F.error(p,one)<1e-10,'Circle reconstructed by first harmonic');
+for(const name of ['moore','heart','flower','star']){const p=F.normalize(F.resample(F.preset(name))),c=F.dft(p),x=F.select(F.dft(p,'x'),31),y=F.select(F.dft(p,'y'),31),z=F.select(c,31);assert(F.error(p,F.select(c,255))<=F.error(p,z)+1e-8,'More harmonics reduce RMS error');for(let i=0;i<20;i++){const t=i/20,v=F.at(z,t);assert(Math.abs(v.x-F.at(x,t).x)<1e-10);assert(Math.abs(v.y-F.at(y,t).x)<1e-10);}console.log(name, 'source vertices',F.preset(name).length,'error N=31',F.error(p,z).toFixed(2)+'%');}
+const d=new Uint8ClampedArray(20*20*4).fill(255);for(let y=4;y<16;y++)for(let x=4;x<16;x++){const k=(y*20+x)*4;d[k]=d[k+1]=d[k+2]=0;}const out=F.contours(d,20,20,128);assert.equal(out.length,1);assert.equal(out[0].length,48);assert.equal(F.contours(new Uint8ClampedArray(20*20*4).fill(255),20,20).length,0);
+const html=require('fs').readFileSync('dist/index.html','utf8'),js=require('fs').readFileSync('dist/app.js','utf8');for(const m of js.matchAll(/\$\('([^']+)'\)/g))assert(html.includes('id="'+m[1]+'"'),'DOM target '+m[1]);console.log('PASS: DFT reconstruction, XY projection equivalence, error convergence, image contour and DOM target checks.');
+// Compare FFT against the defining DFT on a nontrivial signal.
+const input=Array.from({length:32},(_,i)=>({x:Math.sin(i*.7)+i/31,y:Math.cos(i*.31)-i/57})),fast=F.dft(input);
+for(const v of fast){let re=0,im=0;for(let i=0;i<input.length;i++){const a=-2*Math.PI*v.f*i/input.length;re+=input[i].x*Math.cos(a)-input[i].y*Math.sin(a);im+=input[i].x*Math.sin(a)+input[i].y*Math.cos(a);}assert(Math.abs(re/input.length-v.re)<1e-11);assert(Math.abs(im/input.length-v.im)<1e-11);}
+const detail=F.normalize(F.resample(F.preset('moore'))),dft=F.dft(detail),dx=F.dft(detail,'x'),dy=F.dft(detail,'y');
+for(const count of [1,31,255,4999,5000]){const c=F.select(dft,count),x=F.select(dx,count),y=F.select(dy,count);assert.equal(c.length,count);assert.equal(x.length,count);assert.equal(y.length,count);for(const mode of ['xy','complex']){const back=F.reconstruction(c,x,y,8192,mode);assert.equal(back.length,8192);for(const i of [0,53,4011,8191]){const direct=mode==='xy'?{x:F.at(x,i/8192).x,y:F.at(y,i/8192).x}:F.at(c,i/8192);assert(Math.abs(back[i].x-direct.x)<1e-9);assert(Math.abs(back[i].y-direct.y)<1e-9);}}}
+assert(F.error(detail,F.select(dft,5000))<F.error(detail,F.select(dft,255)));
+console.log('PASS: FFT vs direct DFT; exactly 5,000 terms; even/odd XY and complex reconstruction; 8,192 samples.');

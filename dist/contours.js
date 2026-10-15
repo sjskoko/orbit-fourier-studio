@@ -1,0 +1,40 @@
+/* Orbit contour engine. Dependency-free; usable in a Web Worker or Node.js. */
+(function(root){
+'use strict';
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function grayscale(rgba){const n=rgba.length/4,g=new Float32Array(n),alpha=new Float32Array(n);for(let i=0;i<n;i++){const a=rgba[4*i+3]/255;alpha[i]=rgba[4*i+3];g[i]=(.2126*rgba[4*i]+.7152*rgba[4*i+1]+.0722*rgba[4*i+2])*a+255*(1-a);}return{g,alpha};}
+function blur(src,w,h,passes){let a=new Float32Array(src),b=new Float32Array(src.length);for(let k=0;k<passes;k++){for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;b[i]=(a[y*w+Math.max(0,x-1)]+2*a[i]+a[y*w+Math.min(w-1,x+1)])/4;}for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;a[i]=(b[Math.max(0,y-1)*w+x]+2*b[i]+b[Math.min(h-1,y+1)*w+x])/4;}}return a;}
+function otsu(g){const hist=new Uint32Array(256);let total=0;for(const v of g){const x=clamp(Math.round(v),0,255);hist[x]++;total+=x;}let nb=0,sb=0,best=-1,t=127;for(let i=0;i<255;i++){nb+=hist[i];sb+=i*hist[i];if(!nb||nb===g.length)continue;const nf=g.length-nb,score=nb*nf*(sb/nb-(total-sb)/nf)**2;if(score>best){best=score;t=i;}}return t;}
+function adaptive(g,w,h,r=20,offset=8){const stride=w+1,ii=new Float64Array((w+1)*(h+1)),out=new Uint8Array(w*h);for(let y=0;y<h;y++){let sum=0;for(let x=0;x<w;x++){sum+=g[y*w+x];ii[(y+1)*stride+x+1]=ii[y*stride+x+1]+sum;}}for(let y=0;y<h;y++)for(let x=0;x<w;x++){const x0=Math.max(0,x-r),y0=Math.max(0,y-r),x1=Math.min(w,x+r+1),y1=Math.min(h,y+r+1),mean=(ii[y1*stride+x1]-ii[y0*stride+x1]-ii[y1*stride+x0]+ii[y0*stride+x0])/((x1-x0)*(y1-y0));out[y*w+x]=g[y*w+x]<mean-offset?1:0;}return out;}
+function edges(g,w,h,high=80){const n=w*h,mag=new Float32Array(n),dir=new Uint8Array(n),thin=new Float32Array(n);for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x,gx=-g[i-w-1]+g[i-w+1]-2*g[i-1]+2*g[i+1]-g[i+w-1]+g[i+w+1],gy=-g[i-w-1]-2*g[i-w]-g[i-w+1]+g[i+w-1]+2*g[i+w]+g[i+w+1];mag[i]=Math.hypot(gx,gy);dir[i]=(Math.round(Math.atan2(gy,gx)*4/Math.PI)+4)%4;}const offset=[1,w+1,w,w-1];for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){const i=y*w+x,d=offset[dir[i]];if(mag[i]>=mag[i-d]&&mag[i]>=mag[i+d])thin[i]=mag[i];}const out=new Uint8Array(n),queue=new Int32Array(n);let head=0,tail=0;for(let i=0;i<n;i++)if(thin[i]>=high){out[i]=1;queue[tail++]=i;}while(head<tail){const i=queue[head++],x=i%w,y=(i/w)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const xx=x+dx,yy=y+dy,j=yy*w+xx;if(xx>=0&&xx<w&&yy>=0&&yy<h&&!out[j]&&thin[j]>=high*.4){out[j]=1;queue[tail++]=j;}}}return out;}
+function morphology(a,w,h,dilate){const b=new Uint8Array(a.length);for(let y=0;y<h;y++)for(let x=0;x<w;x++){let v=dilate?0:1;outer:for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const xx=x+dx,yy=y+dy,p=xx>=0&&xx<w&&yy>=0&&yy<h?a[yy*w+xx]:0;if(dilate&&p){v=1;break outer;}if(!dilate&&!p){v=0;break outer;}}b[y*w+x]=v;}return b;}
+function removeSmall(mask,w,h,min){const seen=new Uint8Array(mask.length),q=new Int32Array(mask.length);let removed=0;for(let i=0;i<mask.length;i++){if(!mask[i]||seen[i])continue;let head=0,tail=1;q[0]=i;seen[i]=1;while(head<tail){const j=q[head++],x=j%w,y=(j/w)|0;for(const k of [x?j-1:-1,x<w-1?j+1:-1,y?j-w:-1,y<h-1?j+w:-1])if(k>=0&&mask[k]&&!seen[k]){seen[k]=1;q[tail++]=k;}}if(tail<min){removed++;for(let k=0;k<tail;k++)mask[q[k]]=0;}}return removed;}
+function trace(mask,w,h){const stride=w+1,links=new Map(),add=(x,y,d)=>{const id=y*stride+x;links.set(id,(links.get(id)||0)|(1<<d));};for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(mask[y*w+x]){if(!y||!mask[(y-1)*w+x])add(x,y,0);if(x===w-1||!mask[y*w+x+1])add(x+1,y,1);if(y===h-1||!mask[(y+1)*w+x])add(x+1,y+1,2);if(!x||!mask[y*w+x-1])add(x,y+1,3);}const paths=[],delta=[1,stride,-1,-stride];while(links.size){const start=links.keys().next().value;let k=start,prev=-1,p=[],closed=false,guard=0;do{const bits=links.get(k);if(!bits)break;const preference=prev<0?[0,1,2,3]:[(prev+1)%4,prev,(prev+3)%4,(prev+2)%4],d=preference.find(v=>bits&(1<<v));p.push({x:k%stride,y:(k/stride)|0});const rest=bits&~(1<<d);if(rest)links.set(k,rest);else links.delete(k);k+=delta[d];prev=d;if(k===start){closed=true;break;}}while(++guard<w*h*4+4);if(closed&&p.length>=4)paths.push(p);}return paths;}
+function area(p){let s=0;for(let i=0,j=p.length-1;i<p.length;j=i++)s+=p[j].x*p[i].y-p[i].x*p[j].y;return s/2;}
+function segmentDistance(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,t=clamp(((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy||1),0,1);return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy);}
+function rdp(p,epsilon){if(p.length<3)return p;const keep=new Uint8Array(p.length);keep[0]=keep[p.length-1]=1;const stack=[[0,p.length-1]];while(stack.length){const [a,b]=stack.pop();let max=epsilon,index=-1;for(let i=a+1;i<b;i++){const d=segmentDistance(p[i],p[a],p[b]);if(d>max){max=d;index=i;}}if(index>=0){keep[index]=1;stack.push([a,index],[index,b]);}}return p.filter((_,i)=>keep[i]);}
+function simplifyClosed(p,epsilon){if(epsilon<=0||p.length<5)return p;let far=1,d=-1;for(let i=1;i<p.length;i++){const v=(p[i].x-p[0].x)**2+(p[i].y-p[0].y)**2;if(v>d){d=v;far=i;}}const a=rdp(p.slice(0,far+1),epsilon),b=rdp([...p.slice(far),p[0]],epsilon),out=[...a.slice(0,-1),...b.slice(0,-1)];return out.length>=3?out:p;}
+function smooth(p,iterations){let a=p;for(let n=0;n<iterations;n++){const b=[];for(let i=0;i<a.length;i++){const u=a[i],v=a[(i+1)%a.length];b.push({x:.75*u.x+.25*v.x,y:.75*u.y+.25*v.y},{x:.25*u.x+.75*v.x,y:.25*u.y+.75*v.y});}a=b;}return a;}
+function process(rgba,w,h,options={}){
+ if(w<2||h<2||w>1536||h>1536||rgba.length!==w*h*4)throw Error('Invalid image dimensions.');
+ const o={method:'auto',polarity:'auto',threshold:128,denoise:1,cleanup:'close',minArea:16,simplify:1,smooth:1,includeHoles:true,ignoreFrame:true,...options};
+ const {g,alpha}=grayscale(rgba),filtered=blur(g,w,h,clamp(+o.denoise||0,0,4));let transparent=0,visible=0;for(const v of alpha){if(v<16)transparent++;if(v>128)visible++;}
+ let method=o.method,threshold=clamp(+o.threshold||0,0,255),polarity=o.polarity,mask=new Uint8Array(w*h);
+ if(method==='auto')method=transparent>w*h*.01&&visible>0?'alpha':'otsu';
+ if(method==='alpha'){for(let i=0;i<mask.length;i++)mask[i]=alpha[i]>threshold?1:0;polarity='alpha';}
+ else if(method==='edges'){mask=edges(filtered,w,h,Math.max(5,threshold*2));polarity='edges';}
+ else{
+  if(method==='otsu')threshold=otsu(filtered);
+  if(polarity==='auto'){let bright=0,total=0;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(x<2||y<2||x>=w-2||y>=h-2){bright+=filtered[y*w+x]>threshold?1:0;total++;}polarity=bright>=total/2?'dark':'light';}
+  const source=polarity==='light'?Float32Array.from(filtered,v=>255-v):filtered;
+  if(method==='adaptive')mask=adaptive(source,w,h,Math.max(8,Math.round(Math.min(w,h)/24)),2+threshold/16);
+  else for(let i=0;i<mask.length;i++)mask[i]=polarity==='dark'?(filtered[i]<=threshold?1:0):(filtered[i]>threshold?1:0);
+ }
+ if(o.cleanup==='open')mask=morphology(morphology(mask,w,h,false),w,h,true);
+ if(o.cleanup==='close')mask=morphology(morphology(mask,w,h,true),w,h,false);
+ const minArea=Math.max(0,+o.minArea||0),removed=removeSmall(mask,w,h,minArea),raw=trace(mask,w,h),paths=[];let filteredCount=0;
+ for(const p of raw){const signed=area(p),hole=signed<0,touches=p.some(v=>v.x<=1||v.y<=1||v.x>=w-1||v.y>=h-1);if(Math.abs(signed)<minArea||(!o.includeHoles&&hole)||(o.ignoreFrame&&touches)){filteredCount++;continue;}const q=smooth(simplifyClosed(p,clamp(+o.simplify||0,0,5)),clamp(+o.smooth||0,0,3));let length=0;for(let i=0;i<q.length;i++)length+=Math.hypot(q[i].x-q[(i+1)%q.length].x,q[i].y-q[(i+1)%q.length].y);paths.push({points:q,area:Math.abs(signed),hole,length,rawPoints:p.length});}
+ paths.sort((a,b)=>b.area-a.area||b.length-a.length);return{paths:paths.slice(0,100),mask,stats:{method,threshold,polarity,removed,filtered:filteredCount,total:paths.length,returned:Math.min(paths.length,100),width:w,height:h}};
+}
+const api={grayscale,blur,otsu,adaptive,edges,morphology,removeSmall,trace,area,simplifyClosed,smooth,process};if(typeof module!=='undefined')module.exports=api;else root.Contour=api;
+})(globalThis);
