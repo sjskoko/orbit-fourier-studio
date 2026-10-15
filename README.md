@@ -2,9 +2,11 @@
 
 A browser-local creative coding playground that turns sketches and image contours into rotating Fourier epicycles.
 
-![Computed Fourier preview of the Moore curve](assets/preview.svg)
+[![Computed Fourier preview of the Moore curve](assets/preview.svg)](https://sjskoko.github.io/orbit-fourier-studio/)
 
-**Web demo:** the complete static app is in [`dist/`](dist/). The repository is prepared for GitHub Pages; the public demo link will be added after the first successful deployment.
+**[Launch the live web demo →](https://sjskoko.github.io/orbit-fourier-studio/)**
+
+Draw a path or upload an image, refine its contour, and animate it with up to 5,000 Fourier terms. Click the preview above to launch the studio.
 
 **Offline:** download [`orbit-studio.html`](dist/orbit-studio.html) and open it in a modern browser. No server or installation is required for the standalone version.
 
@@ -100,7 +102,7 @@ assets/preview.svg    Illustration computed from the Fourier model
 
 ## GitHub Pages
 
-The included `pages.yml` workflow tests the source, rebuilds the offline file and publishes `dist/`. In repository **Settings → Pages**, select **GitHub Actions** as the source. Once the workflow succeeds, use its deployment URL as the README demo link and repository website.
+The live demo is deployed automatically by the included `pages.yml` workflow. Every push to `main` tests the source, rebuilds the offline file and publishes `dist/` to GitHub Pages. For a fork, select **GitHub Actions** in **Settings → Pages** and run the workflow.
 
 GitHub Pages normally includes the GitHub account or organization handle in its URL. Use a custom domain if an account-free URL is required. This repository intentionally excludes the private hosting manifest, account-specific deployment links, credentials and user-uploaded images.
 
