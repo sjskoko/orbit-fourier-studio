@@ -14,7 +14,7 @@ Draw a path or upload an image, refine its contour, and animate it with up to 5,
 
 ## Features
 
-- **24 shape presets:** polygons, polar roses, Lissajous curves, spirographs, a closed spiral ribbon and fractals, with thumbnail previews, search, family filters and a Surprise me button.
+- **24 presets, including 8 detailed illustrations:** animals, ornaments, star polygons, polar roses, Lissajous curves, spirographs and fractals, with thumbnail previews, search, family filters and a Surprise me button.
 
 - **Draw your own path** with a mouse, touch screen or stylus; undo and clear strokes.
 - **Upload an image** and inspect candidate contours before animating one.
@@ -34,13 +34,16 @@ Use **Presets** to search by name or filter by family. Select a thumbnail to ani
 
 | Family | Shapes |
 | --- | --- |
-| Geometry | Circle, triangle, square, hexagon, octagon, star, pentagram, rounded square |
-| Flowers & hearts | Heart, five-petal flower, five-petal rose, eight-petal rose |
-| Waves & spirals | Infinity, Lissajous 3:2, 4:5 and 5:7, spiral ribbon |
-| Spirographs | Astroid, deltoid, cardioid, outer and inner spirographs |
-| Fractals | Moore curve, Koch snowflake |
+| Animals & ornaments | Monarch butterfly, engraved owl, ornamental koi, armored seahorse, heraldic dragon, geometric stag, lotus ornament, winged scarab |
+| Geometry | 17-point star weave, circle, star, pentagram |
+| Flowers & hearts | Heart, five-petal flower, eight-petal rose |
+| Waves & spirals | Infinity, Lissajous 4:5 and 5:7 |
+| Spirographs | Torus knot 9:16, guilloche rosette, inner spirograph |
+| Fractals | Moore curve, Koch snowflake, Koch snowflake V (3,072 edges) |
 
-The spiral follows both edges of a narrow ribbon so it remains a closed path. High term counts reveal corners and fine detail in polygon and fractal presets.
+The 8 illustrations are original vector line drawings, with internal details as well as outlines. Their strokes are connected to nearby existing vertices and open branches are retraced, so a single Fourier tip can draw the complete image. Short connecting seams and repeated sections are part of the path. There are no hidden pen lifts. Try **511–1,500 terms** for the illustrations; **3,000–5,000** preserve the smallest details. The selected term count is never changed automatically.
+
+Version 1.4 replaces exactly 12 of the previous 24 gallery entries. The other 12 are retained. Removed entries remain supported by the geometry engine for compatibility, but are not shown in the gallery. Complex thumbnails use more samples so fine lines remain recognizable.
 
 ## Support Orbit
 

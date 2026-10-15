@@ -32,3 +32,12 @@ Browser-level encoding, device share sheets and Instagram import were not tested
 - Added 24 shape presets with searchable thumbnails, five families, and random selection within the active filter.
 - Added voluntary GitHub Star links in the studio header, support card, completed-video panel and Story page, with a short sign-in-and-star explanation.
 - New preset tests verify finite normalized paths, Fourier convergence and 5,000-term reconstruction for every shape, including the spiral ribbon and fractal boundary.
+
+## Version 1.4 additions
+
+- Replaced exactly 12 gallery entries while retaining 24 total: eight original animal/ornament drawings and four advanced geometric patterns.
+- Added sampled vector line art for a butterfly, owl, koi, seahorse, dragon, stag, lotus and winged scarab. Internal features are connected and open branches are retraced as a continuous closed walk; seams are visible by design.
+- Added a 17/7 star polygon, 9:16 torus-knot projection, guilloche rosette and fifth-order Koch boundary (3,072 edges).
+- Added an Animals & ornaments filter and raised thumbnail sampling for detailed line art. Preset selection preserves the user's term count.
+- Rendered all 12 new paths into a review sheet and inspected recognizable silhouettes, internal lines, orientation and framing.
+- The full test suite passes, including exact replacement/drawing counts, closed illustration walks, cache immutability and less than 0.1% normalized reconstruction error at 5,000 terms for every gallery entry. Rebuilt the offline HTML with embedded illustration data.

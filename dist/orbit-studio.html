@@ -12,7 +12,7 @@
 <div class="transport"><button id="play" class="play" aria-label="Pause animation">Ⅱ</button><button id="restart" class="icon" aria-label="Restart animation">↺</button><input id="progress" type="range" min="0" max="1" step="0.001" value="0" aria-label="Drawing progress"><span id="progressLabel">0%</span><select id="speed" aria-label="Playback speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div>
 <div class="metrics"><div><span>Fourier terms</span><strong id="nValue">31<small> / axis</small></strong></div><div><span>Normalized RMS error <button class="info" title="RMS reconstruction error divided by the centered RMS magnitude of the sampled source path.">ⓘ</button></span><strong id="errorValue">—<small>%</small></strong></div><div><span>Path samples</span><strong>8,192<small> points</small></strong></div><div class="formula">f(t) = ∑ cₙ eⁱⁿᵗ<span>Complex paths. Simple circles.</span></div></div>
 </section><aside><div class="panel-head"><span class="eyebrow">YOUR INPUT</span><h2>What will your circles draw?</h2></div><button id="openUpload" class="primary upload-main">↑ Upload an image</button><div class="tabs" role="tablist"><button class="active" data-tab="presets" role="tab" aria-selected="true">Presets</button><button data-tab="draw" role="tab" aria-selected="false">Draw</button><button data-tab="image" role="tab" aria-selected="false">Image lab</button></div>
-<section class="tab-panel" id="presets"><div class="preset-toolbar"><label class="sr-only" for="presetSearch">Search shapes</label><input id="presetSearch" type="search" placeholder="Search shapes…" autocomplete="off"><label class="sr-only" for="presetCategory">Shape family</label><select id="presetCategory"><option value="all">All shapes</option><option value="geometry">Geometry</option><option value="petals">Flowers &amp; hearts</option><option value="waves">Waves &amp; spirals</option><option value="spirographs">Spirographs</option><option value="fractals">Fractals</option></select></div><div class="preset-summary"><span id="presetCount" role="status">24 shapes</span><button id="randomPreset" class="text-btn">↻ Surprise me</button></div><div class="presets" id="presetGrid" aria-label="Pattern gallery"></div><p id="presetEmpty" class="hint" hidden>No matching shapes. Try another name or family.</p><p class="hint" id="presetDescription">A continuous space-filling loop. More terms reveal its tight corners.</p></section>
+<section class="tab-panel" id="presets"><div class="preset-toolbar"><label class="sr-only" for="presetSearch">Search shapes</label><input id="presetSearch" type="search" placeholder="Search shapes…" autocomplete="off"><label class="sr-only" for="presetCategory">Shape family</label><select id="presetCategory"><option value="all">All shapes</option><option value="illustrations">Animals &amp; ornaments</option><option value="geometry">Geometry</option><option value="petals">Flowers &amp; hearts</option><option value="waves">Waves &amp; spirals</option><option value="spirographs">Spirographs</option><option value="fractals">Fractals</option></select></div><div class="preset-summary"><span id="presetCount" role="status">24 shapes</span><button id="randomPreset" class="text-btn">↻ Surprise me</button></div><div class="presets" id="presetGrid" aria-label="Pattern gallery"></div><p id="presetEmpty" class="hint" hidden>No matching shapes. Try another name or family.</p><p class="hint" id="presetDescription">A continuous space-filling loop. More terms reveal its tight corners.</p></section>
 <section class="tab-panel" id="draw" hidden><div class="draw-wrap"><canvas id="drawing" width="600" height="420" aria-label="Draw a pattern using touch, mouse or a stylus"></canvas><span id="drawHint">Make a mark here.</span></div><div class="draw-tools"><button id="undo">↶ Undo</button><button id="clearDrawing">Clear</button><label>Ink <input id="penColor" type="color" value="#fa886d"></label></div><button id="applyDrawing" class="primary">Animate my drawing ↗</button><p class="hint">Touch, mouse and stylus supported. Separate strokes and the final endpoints are connected in drawing order to create one closed path.</p></section>
 <section class="tab-panel" id="image" hidden><div class="upload" id="dropZone"><label for="imageFile">Choose an image, or drop it here</label><input id="imageFile" type="file" accept="image/*,.svg,.png,.jpg,.jpeg,.webp"><small>PNG · JPG · WebP · SVG · up to 30 MB</small></div><p id="imageStatus" class="hint" role="status">Images stay on this device.</p><div id="imageOptions" hidden>
 <canvas id="imagePreview" width="480" height="300" aria-label="Contour preview. Click a contour to select it."></canvas><div class="preview-tools"><label class="check"><input id="showMask" type="checkbox">Binary mask</label><button id="resetImage" class="text-btn">Reset settings</button></div>
@@ -27,7 +27,176 @@
 <p id="contourStats" class="hint" role="status"></p><label class="control-label" for="contourSelect">Choose a contour</label><select id="contourSelect"></select><p class="hint">Or click a line in the preview. One closed contour is animated at a time.</p><button id="applyImage" class="primary">Animate selected contour ↗</button>
 </div></section>
 <div class="divider"></div><section class="settings"><span class="eyebrow">FINE TUNE</span><label class="control-label" for="harmonics">Fourier terms <output id="nLabel">31</output></label><input id="harmonics" type="range" min="1" max="5000" step="1" value="31"><div class="range-ends"><span>1 term</span><span>5,000 terms</span></div><label class="number-row" for="nInput">Exact term count <input id="nInput" type="number" min="1" max="5000" step="1" value="31" inputmode="numeric"></label><label class="control-label" for="mode">Visualization</label><select id="mode"><option value="xy">X · Y projection — two chains</option><option value="complex">Complex plane — single chain</option></select><div class="switches"><label class="check"><input id="showOriginal" type="checkbox" checked>Source path</label><label class="check"><input id="showCircles" type="checkbox" checked>Circles</label><label class="check"><input id="showGuides" type="checkbox" checked>Guides</label></div><div class="color-row"><label>Path <input id="traceColor" type="color" value="#ff8469"></label><label>Background <input id="bgColor" type="color" value="#111617"></label></div></section>
-<div class="divider"></div><div class="exports"><button id="savePng">↓ Save PNG</button><button id="saveSvg">↓ Path SVG</button></div><button id="openVideo" class="primary">↓ Export video</button><p class="hint">Story 9:16 · Square · Landscape</p><div class="project-tools"><button id="saveProject" class="text-btn">Save project</button><label class="text-btn">Open project<input id="loadProject" type="file" accept=".json" hidden></label></div><section class="support-card" aria-label="Support Orbit"><span class="eyebrow">ENJOYING THE ORBITS?</span><p>A star helps more people discover Orbit.</p><a class="github-star" href="https://github.com/sjskoko/orbit-fourier-studio" target="_blank" rel="noopener noreferrer" aria-label="Star Orbit on GitHub (opens in a new tab)"><span aria-hidden="true">☆</span> Star on GitHub <span aria-hidden="true">↗</span></a><small>Open the repository, sign in if needed, then tap <strong>☆ Star</strong>.</small></section><p class="privacy">Images and sketches are processed locally.</p></aside></main><footer><span>ORBIT / A STUDY OF MOTION</span><a href="https://sjskoko.github.io/orbit-fourier-studio/story/" class="text-btn">Story &amp; share ↗</a><a href="orbit-studio.html" download="orbit-studio.html" class="text-btn">↓ Offline HTML</a></footer><div id="toast" role="status" aria-live="polite"></div><dialog id="helpDialog"><button id="closeHelp" class="close">×</button><span class="eyebrow">HOW IT WORKS</span><h2>Circles become a drawing.</h2><p>Orbit samples a closed path at 8,192 evenly spaced points and decomposes it using a fast Fourier transform. Each rotating circle represents a frequency component.</p><p>In X · Y mode, the horizontal position of the top chain and the vertical position of the left chain meet at the drawing point. Choose 1–5,000 signed-frequency terms, ordered from low to high frequency. Each axis uses N terms; with even N, the last frequency pair is incomplete.</p><p>Image lab offers automatic silhouette detection, transparency extraction, adaptive thresholding and Canny-style edges. Denoise, morphological cleanup, area filtering, simplification and smoothing refine the result. These are geometric image-processing tools, not semantic AI segmentation. Photo-edge mode traces boundaries of edge regions, which can produce double outlines.</p><p>The error compares the Fourier reconstruction against the selected, processed path, not against the original photo. PNG exports the current canvas. SVG exports the complete reconstructed path. Video export records one loop in portrait, square or landscape format. MP4 is offered when supported; otherwise choose WebM. Keep the page visible until export finishes. Project JSON stores the active path and drawing, not the original image or image-lab settings.</p><button id="helpDone" class="primary">Let's draw</button></dialog><dialog id="videoDialog" aria-labelledby="videoTitle"><button id="closeVideo" class="close" aria-label="Close video export">×</button><span class="eyebrow">MAKE IT MOVE</span><h2 id="videoTitle">Export your orbit.</h2><p>One complete drawing, with a one-second hold at the end. Your current pattern and colors are preserved.</p><div class="video-config" id="videoConfig"><div class="image-grid"><div><label class="control-label" for="videoLayout">Frame</label><select id="videoLayout"><option value="story">Story · 9:16</option><option value="square">Square · 1:1</option><option value="landscape">Landscape · 16:9</option></select></div><div><label class="control-label" for="videoQuality">Quality</label><select id="videoQuality"><option value="hd">1080p</option><option value="fast">720p · faster</option></select></div><div><label class="control-label" for="videoDuration">Length</label><select id="videoDuration"><option value="6">6 seconds</option><option value="15" selected>15 seconds</option><option value="30">30 seconds</option></select></div><div><label class="control-label" for="videoFormat">File format</label><select id="videoFormat"></select></div></div><label class="check"><input id="videoBrand" type="checkbox" checked>Include a “Make your own” footer</label></div><p id="videoHint" class="hint"></p><canvas id="videoPreview" aria-label="Video composition preview"></canvas><progress id="videoProgress" value="0" max="1" hidden></progress><p id="videoStatus" role="status" aria-live="polite">Choose a frame to preview.</p><div id="videoResult" hidden><video id="videoPlayback" controls playsinline preload="metadata"></video><div class="exports"><a id="downloadVideo" class="primary" download>↓ Download video</a><button id="shareVideo">Share file ↗</button></div><p class="hint">For Instagram: save the video, then select it in Story. Add the Story page URL with a Link sticker. WebM may need conversion to MP4.</p><div class="export-support"><p>Happy with your orbit? Give the project a star.</p><a class="github-star" href="https://github.com/sjskoko/orbit-fourier-studio" target="_blank" rel="noopener noreferrer" aria-label="Star Orbit on GitHub (opens in a new tab)"><span aria-hidden="true">☆</span> Star on GitHub <span aria-hidden="true">↗</span></a><small>On GitHub, tap ☆ Star at the top of the repository.</small></div></div><button id="startVideo" class="primary">Create video</button><button id="cancelVideo" class="text-btn" hidden>Cancel export</button></dialog><script id="inlineContourWorker" type="text/plain">/* Orbit contour engine. Dependency-free; usable in a Web Worker or Node.js. */
+<div class="divider"></div><div class="exports"><button id="savePng">↓ Save PNG</button><button id="saveSvg">↓ Path SVG</button></div><button id="openVideo" class="primary">↓ Export video</button><p class="hint">Story 9:16 · Square · Landscape</p><div class="project-tools"><button id="saveProject" class="text-btn">Save project</button><label class="text-btn">Open project<input id="loadProject" type="file" accept=".json" hidden></label></div><section class="support-card" aria-label="Support Orbit"><span class="eyebrow">ENJOYING THE ORBITS?</span><p>A star helps more people discover Orbit.</p><a class="github-star" href="https://github.com/sjskoko/orbit-fourier-studio" target="_blank" rel="noopener noreferrer" aria-label="Star Orbit on GitHub (opens in a new tab)"><span aria-hidden="true">☆</span> Star on GitHub <span aria-hidden="true">↗</span></a><small>Open the repository, sign in if needed, then tap <strong>☆ Star</strong>.</small></section><p class="privacy">Images and sketches are processed locally.</p></aside></main><footer><span>ORBIT / A STUDY OF MOTION</span><a href="https://sjskoko.github.io/orbit-fourier-studio/story/" class="text-btn">Story &amp; share ↗</a><a href="orbit-studio.html" download="orbit-studio.html" class="text-btn">↓ Offline HTML</a></footer><div id="toast" role="status" aria-live="polite"></div><dialog id="helpDialog"><button id="closeHelp" class="close">×</button><span class="eyebrow">HOW IT WORKS</span><h2>Circles become a drawing.</h2><p>Orbit samples a closed path at 8,192 evenly spaced points and decomposes it using a fast Fourier transform. Each rotating circle represents a frequency component.</p><p>In X · Y mode, the horizontal position of the top chain and the vertical position of the left chain meet at the drawing point. Choose 1–5,000 signed-frequency terms, ordered from low to high frequency. Each axis uses N terms; with even N, the last frequency pair is incomplete.</p><p>Image lab offers automatic silhouette detection, transparency extraction, adaptive thresholding and Canny-style edges. Denoise, morphological cleanup, area filtering, simplification and smoothing refine the result. These are geometric image-processing tools, not semantic AI segmentation. Photo-edge mode traces boundaries of edge regions, which can produce double outlines.</p><p>The error compares the Fourier reconstruction against the selected, processed path, not against the original photo. PNG exports the current canvas. SVG exports the complete reconstructed path. Video export records one loop in portrait, square or landscape format. MP4 is offered when supported; otherwise choose WebM. Keep the page visible until export finishes. Project JSON stores the active path and drawing, not the original image or image-lab settings.</p><button id="helpDone" class="primary">Let's draw</button></dialog><dialog id="videoDialog" aria-labelledby="videoTitle"><button id="closeVideo" class="close" aria-label="Close video export">×</button><span class="eyebrow">MAKE IT MOVE</span><h2 id="videoTitle">Export your orbit.</h2><p>One complete drawing, with a one-second hold at the end. Your current pattern and colors are preserved.</p><div class="video-config" id="videoConfig"><div class="image-grid"><div><label class="control-label" for="videoLayout">Frame</label><select id="videoLayout"><option value="story">Story · 9:16</option><option value="square">Square · 1:1</option><option value="landscape">Landscape · 16:9</option></select></div><div><label class="control-label" for="videoQuality">Quality</label><select id="videoQuality"><option value="hd">1080p</option><option value="fast">720p · faster</option></select></div><div><label class="control-label" for="videoDuration">Length</label><select id="videoDuration"><option value="6">6 seconds</option><option value="15" selected>15 seconds</option><option value="30">30 seconds</option></select></div><div><label class="control-label" for="videoFormat">File format</label><select id="videoFormat"></select></div></div><label class="check"><input id="videoBrand" type="checkbox" checked>Include a “Make your own” footer</label></div><p id="videoHint" class="hint"></p><canvas id="videoPreview" aria-label="Video composition preview"></canvas><progress id="videoProgress" value="0" max="1" hidden></progress><p id="videoStatus" role="status" aria-live="polite">Choose a frame to preview.</p><div id="videoResult" hidden><video id="videoPlayback" controls playsinline preload="metadata"></video><div class="exports"><a id="downloadVideo" class="primary" download>↓ Download video</a><button id="shareVideo">Share file ↗</button></div><p class="hint">For Instagram: save the video, then select it in Story. Add the Story page URL with a Link sticker. WebM may need conversion to MP4.</p><div class="export-support"><p>Happy with your orbit? Give the project a star.</p><a class="github-star" href="https://github.com/sjskoko/orbit-fourier-studio" target="_blank" rel="noopener noreferrer" aria-label="Star Orbit on GitHub (opens in a new tab)"><span aria-hidden="true">☆</span> Star on GitHub <span aria-hidden="true">↗</span></a><small>On GitHub, tap ☆ Star at the top of the repository.</small></div></div><button id="startVideo" class="primary">Create video</button><button id="cancelVideo" class="text-btn" hidden>Cancel export</button></dialog><script>(function(root){
+'use strict';
+// Original vector line art. Coordinates use a 1,000-unit drawing board.
+// Every feature is visited from its nearest existing vertex and retraced when
+// open, making a single continuous closed walk without pen-up discontinuities.
+const drawings={
+ butterfly:[
+ 'M 500 280 C 405 170 240 60 120 100 C 15 140 75 325 185 420 C 70 460 55 650 155 715 C 265 790 425 660 500 520 C 575 660 735 790 845 715 C 945 650 930 460 815 420 C 925 325 985 140 880 100 C 760 60 595 170 500 280 Z',
+ 'M 500 280 C 477 340 477 470 500 550 C 523 470 523 340 500 280 Z',
+ 'M 500 280 C 485 245 460 220 440 230 C 423 243 444 254 450 240',
+ 'M 500 280 C 515 245 540 220 560 230 C 577 243 556 254 550 240',
+ 'M 500 340 C 362 168 176 96 136 155 C 120 215 278 340 500 400',
+ 'M 500 400 C 328 385 216 306 175 240 C 124 323 242 427 400 455 L 500 440',
+ 'M 500 440 C 345 433 193 478 145 565 C 102 653 187 698 275 641 C 365 586 415 495 500 470',
+ 'M 500 490 C 379 580 313 725 220 680',
+ 'M 500 340 C 638 168 824 96 864 155 C 880 215 722 340 500 400',
+ 'M 500 400 C 672 385 784 306 825 240 C 876 323 758 427 600 455 L 500 440',
+ 'M 500 440 C 655 433 807 478 855 565 C 898 653 813 698 725 641 C 635 586 585 495 500 470',
+ 'M 500 490 C 621 580 687 725 780 680',
+ 'M 275 641 Q 200 565 285 520 Q 364 522 330 590 Q 294 640 275 641 Z',
+ 'M 725 641 Q 800 565 715 520 Q 636 522 670 590 Q 706 640 725 641 Z'
+ ],
+ owl:[
+ 'M 500 205 Q 410 128 300 95 L 306 232 C 201 309 186 451 245 567 C 270 669 279 775 385 833 L 500 885 L 615 833 C 721 775 730 669 755 567 C 814 451 799 309 694 232 L 700 95 Q 590 128 500 205 Z',
+ 'M 306 232 Q 400 191 500 290 Q 600 191 694 232',
+ 'M 500 290 C 460 218 329 210 280 313 C 220 443 362 515 452 448 L 500 405 L 548 448 C 638 515 780 443 720 313 C 671 210 540 218 500 290 Z',
+ 'M 500 405 L 474 435 L 500 490 L 526 435 Z',
+ 'M 280 313 Q 340 263 400 294 C 465 326 435 410 382 410 C 310 415 288 337 338 309 C 385 284 420 347 382 365 C 350 382 332 337 362 328',
+ 'M 720 313 Q 660 263 600 294 C 535 326 565 410 618 410 C 690 415 712 337 662 309 C 615 284 580 347 618 365 C 650 382 668 337 638 328',
+ 'M 245 567 Q 275 480 333 479 Q 370 680 385 833 Q 266 690 245 567',
+ 'M 755 567 Q 725 480 667 479 Q 630 680 615 833 Q 734 690 755 567',
+ 'M 333 479 Q 305 568 349 674 Q 281 612 292 550',
+ 'M 667 479 Q 695 568 651 674 Q 719 612 708 550',
+ 'M 385 833 L 355 870 L 380 861 L 395 883 L 412 857 L 430 868 L 436 853',
+ 'M 615 833 L 645 870 L 620 861 L 605 883 L 588 857 L 570 868 L 564 853'
+ ],
+ koi:[
+ 'M 280 535 C 162 494 105 382 143 270 C 198 105 452 105 621 258 C 720 345 744 480 716 585 C 752 660 865 653 925 734 Q 826 716 813 774 Q 778 813 811 874 C 693 812 671 726 661 651 C 580 728 435 691 378 604 Q 315 611 280 535 Z',
+ 'M 143 270 Q 254 226 304 311 Q 349 374 280 535',
+ 'M 304 311 C 470 233 619 387 661 651',
+ 'M 378 604 C 392 482 410 422 371 360 Q 458 401 464 478 Q 451 544 378 604',
+ 'M 621 258 Q 727 260 794 387 Q 733 349 722 430',
+ 'M 716 585 Q 691 632 661 651',
+ 'M 716 585 Q 729 733 813 774',
+ 'M 661 651 Q 732 785 811 874',
+ 'M 143 270 Q 102 255 78 290 Q 65 322 114 309',
+ 'M 143 270 Q 116 200 79 224',
+ 'M 304 311 Q 242 258 211 288 C 183 315 226 344 243 320 C 259 293 220 286 211 308',
+ 'M 378 604 Q 411 584 446 540 Q 435 573 416 611',
+ 'M 794 387 L 749 331 L 748 378',
+ 'M 925 734 Q 809 677 779 728 L 813 774'
+ ],
+ seahorse:[
+ 'M 432 147 Q 394 91 376 133 L 350 106 L 332 164 Q 272 191 285 259 L 181 319 L 204 363 L 329 329 C 363 361 320 424 278 490 C 225 579 239 722 343 789 C 458 870 625 809 636 701 C 649 588 515 551 457 622 C 410 682 459 742 509 724 C 550 706 518 664 491 685 C 496 643 554 656 545 699 C 533 760 437 753 403 701 C 359 632 407 570 446 526 Q 499 466 472 403 L 510 379 L 473 351 L 495 318 L 457 294 L 479 254 L 442 234 Q 463 185 432 147 Z',
+ 'M 350 106 L 367 171 Q 388 190 432 147',
+ 'M 329 329 Q 365 282 370 242 C 380 190 437 209 430 244 C 425 277 386 275 389 246 Q 392 224 411 239',
+ 'M 278 490 Q 336 466 365 422 Q 389 502 331 554 L 278 490',
+ 'M 278 490 L 332 509 L 309 528',
+ 'M 457 294 Q 404 317 411 369 Q 435 405 423 449 C 383 539 303 628 351 717 Q 411 811 519 781',
+ 'M 204 363 L 218 337 L 181 319',
+ 'M 442 234 L 458 242',
+ 'M 403 701 Q 372 720 351 717'
+ ],
+ dragon:[
+ 'M 180 418 L 125 375 L 209 349 L 235 297 L 292 300 L 309 254 L 338 292 L 410 267 L 376 322 C 451 336 519 383 566 454 L 601 380 L 628 415 L 667 314 L 688 364 L 748 200 L 755 308 L 846 249 L 816 368 L 917 343 L 850 448 L 940 462 L 827 533 C 908 613 849 751 738 769 C 634 784 561 728 598 656 C 624 610 683 626 674 667 Q 666 692 644 675 C 682 744 780 693 771 641 C 762 588 682 580 609 601 L 585 681 L 631 723 L 582 717 L 566 749 L 552 712 L 515 723 L 530 669 L 538 606 C 489 599 445 578 409 542 L 362 594 L 365 646 L 336 623 L 306 646 L 310 613 L 278 611 L 321 579 L 359 483 Q 316 455 294 412 L 250 435 L 241 408 L 211 434 L 208 405 Z',
+ 'M 566 454 L 628 415 L 688 364 L 755 308 L 816 368 L 850 448 L 827 533 L 609 601',
+ 'M 566 454 Q 705 446 755 308',
+ 'M 566 454 Q 709 504 850 448',
+ 'M 566 454 Q 667 548 827 533',
+ 'M 359 483 C 416 420 523 460 538 606',
+ 'M 294 412 Q 323 364 376 322',
+ 'M 235 297 L 262 336 L 292 300',
+ 'M 262 336 Q 283 357 311 337 L 283 330 Z',
+ 'M 180 418 Q 188 374 209 349',
+ 'M 409 542 Q 440 521 464 516 L 490 557 L 515 547 L 538 606',
+ 'M 609 601 Q 645 544 705 568 Q 735 595 771 641',
+ 'M 738 769 Q 754 730 780 714'
+ ],
+ stag:[
+ 'M 500 354 L 447 315 Q 431 228 387 179 L 367 89 L 354 169 L 315 136 L 281 62 L 294 149 L 261 132 L 220 78 L 240 153 L 194 144 L 147 111 L 175 160 L 246 184 L 201 213 L 138 201 L 189 236 L 261 221 L 305 199 Q 373 244 386 302 L 307 268 L 231 279 L 307 355 L 407 378 L 388 503 L 421 676 L 466 775 L 500 804 L 534 775 L 579 676 L 612 503 L 593 378 L 693 355 L 769 279 L 693 268 L 614 302 Q 627 244 695 199 L 739 221 L 811 236 L 862 201 L 799 213 L 754 184 L 825 160 L 853 111 L 806 144 L 760 153 L 780 78 L 739 132 L 706 149 L 719 62 L 685 136 L 646 169 L 633 89 L 613 179 Q 569 228 553 315 Z',
+ 'M 407 378 L 449 433 L 500 354 L 551 433 L 593 378',
+ 'M 449 433 L 470 562 L 500 625 L 530 562 L 551 433',
+ 'M 388 503 L 439 489 L 470 562 L 421 538 Z',
+ 'M 612 503 L 561 489 L 530 562 L 579 538 Z',
+ 'M 421 538 L 437 519 L 450 532 Z',
+ 'M 579 538 L 563 519 L 550 532 Z',
+ 'M 421 676 L 470 562 L 500 625 L 530 562 L 579 676 L 535 710 L 500 682 L 465 710 Z',
+ 'M 465 710 L 500 742 L 535 710 L 500 682 Z',
+ 'M 500 742 L 500 804',
+ 'M 307 268 L 355 325 L 407 378',
+ 'M 693 268 L 645 325 L 593 378',
+ 'M 447 315 L 386 302 L 407 378',
+ 'M 553 315 L 614 302 L 593 378'
+ ],
+ lotus:[
+ 'M 500 730 C 315 775 112 689 80 550 Q 204 532 309 581 C 204 474 193 347 238 247 Q 390 304 438 429 C 405 259 453 128 500 65 C 547 128 595 259 562 429 Q 610 304 762 247 C 807 347 796 474 691 581 Q 796 532 920 550 C 888 689 685 775 500 730 Z',
+ 'M 500 730 C 377 597 389 490 500 345 C 611 490 623 597 500 730 Z',
+ 'M 500 730 C 489 521 323 364 238 247',
+ 'M 500 730 C 511 521 677 364 762 247',
+ 'M 500 730 C 341 572 188 608 80 550',
+ 'M 500 730 C 659 572 812 608 920 550',
+ 'M 500 345 L 500 65',
+ 'M 438 429 Q 468 374 500 345 Q 532 374 562 429',
+ 'M 309 581 Q 372 595 406 633',
+ 'M 691 581 Q 628 595 594 633',
+ 'M 500 730 Q 446 808 278 815 Q 352 877 500 835 Q 648 877 722 815 Q 554 808 500 730',
+ 'M 500 835 L 500 906',
+ 'M 500 730 Q 470 675 500 621 Q 530 675 500 730 Z'
+ ],
+ scarab:[
+ 'M 500 227 C 449 216 413 254 424 295 C 344 320 315 428 335 549 Q 360 682 500 745 Q 640 682 665 549 C 685 428 656 320 576 295 C 587 254 551 216 500 227 Z',
+ 'M 424 295 Q 500 344 576 295',
+ 'M 335 549 Q 388 425 476 363 L 500 745 L 524 363 Q 612 425 665 549',
+ 'M 500 745 Q 355 819 205 699 L 95 390 Q 243 408 335 549',
+ 'M 500 745 Q 645 819 795 699 L 905 390 Q 757 408 665 549',
+ 'M 424 295 L 365 265 L 331 194 L 358 138 L 377 160 L 368 191 L 401 230 L 449 238',
+ 'M 576 295 L 635 265 L 669 194 L 642 138 L 623 160 L 632 191 L 599 230 L 551 238',
+ 'M 335 430 L 280 380 L 236 302 L 201 292 L 229 274 L 260 292 L 313 355 L 350 376',
+ 'M 665 430 L 720 380 L 764 302 L 799 292 L 771 274 L 740 292 L 687 355 L 650 376',
+ 'M 335 549 L 294 589 L 313 682 L 354 740 L 338 779 L 317 753 L 287 694 L 263 587 L 319 514',
+ 'M 665 549 L 706 589 L 687 682 L 646 740 L 662 779 L 683 753 L 713 694 L 737 587 L 681 514',
+ 'M 500 227 C 360 228 370 40 500 40 C 630 40 640 228 500 227 Z',
+ 'M 500 227 C 401 224 416 80 500 80 C 584 80 599 224 500 227 Z',
+ 'M 424 295 Q 455 254 500 268 Q 545 254 576 295'
+ ]
+};
+// Add original repeated engraving details to the connected drawings.
+for(let row=0;row<4;row++)for(let col=0;col<3;col++){
+ const x=404+col*48+(row%2)*10,y=529+row*53;
+ drawings.owl.push(`M ${x} ${y} Q ${x+20} ${y+32} ${x+40} ${y}`);
+}
+for(let row=0;row<6;row++)for(let col=0;col<3;col++){
+ const x=354+row*34+col*33,y=306+row*47-col*8;
+ drawings.koi.push(`M ${x} ${y} Q ${x+4} ${y+31} ${x+30} ${y+30}`);
+}
+for(let j=0;j<8;j++){
+ const y=360+j*39,x=322+(j<4?j*4:(7-j)*3);
+ drawings.seahorse.push(`M ${x} ${y} Q ${x+48} ${y+20} ${x+92-(j>3?(j-3)*5:0)} ${y+5}`);
+}
+for(let j=0;j<7;j++){
+ const t=j/6,x=148+185*t,y=442+270*t;
+ drawings.scarab.push(`M ${x} ${y} Q ${259+55*t} ${435+235*t} ${387+80*t} ${653+60*t}`);
+ drawings.scarab.push(`M ${1000-x} ${y} Q ${741-55*t} ${435+235*t} ${613-80*t} ${653+60*t}`);
+}
+function sample(d){
+ const tokens=d.match(/[MLCQZ]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi)||[];let i=0,p={x:0,y:0},start=null,out=[];
+ const read=()=>({x:Number(tokens[i++]),y:Number(tokens[i++])});
+ while(i<tokens.length){const op=tokens[i++];if(op==='M'){p=read();start={...p};out.push({...p});continue;}
+  if(op==='Z'){if(start)out.push({...start});p={...start};continue;}
+  const a={...p},b=read();if(op==='L'){out.push(b);p=b;continue;}
+  const c=read(),end=op==='C'?read():c;
+  if(op!=='Q'&&op!=='C')throw Error('Unsupported illustration command: '+op);
+  for(let k=1;k<=24;k++){const t=k/24,u=1-t;out.push(op==='C'?{x:u*u*u*a.x+3*u*u*t*b.x+3*u*t*t*c.x+t*t*t*end.x,y:u*u*u*a.y+3*u*u*t*b.y+3*u*t*t*c.y+t*t*t*end.y}:{x:u*u*a.x+2*u*t*b.x+t*t*end.x,y:u*u*a.y+2*u*t*b.y+t*t*end.y});}p=end;
+ }
+ // Uniformly split long segments so connection anchors have enough resolution.
+ const dense=[out[0]];for(let j=1;j<out.length;j++){const a=out[j-1],b=out[j],n=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/5));for(let k=1;k<=n;k++)dense.push({x:a.x+(b.x-a.x)*k/n,y:a.y+(b.y-a.y)*k/n});}return dense;
+}
+const cache=new Map();
+function path(id){if(cache.has(id))return cache.get(id).map(p=>({...p}));if(!drawings[id])return null;
+ const strokes=drawings[id].map(sample);let route=strokes.shift();if(Math.hypot(route[0].x-route.at(-1).x,route[0].y-route.at(-1).y)>1e-6)route.push({...route[0]});
+ for(const points of strokes){let best=Infinity,anchor=0;for(let j=0;j<route.length;j++){const d=(route[j].x-points[0].x)**2+(route[j].y-points[0].y)**2;if(d<best){best=d;anchor=j;}}
+  const closed=Math.hypot(points[0].x-points.at(-1).x,points[0].y-points.at(-1).y)<1e-6;
+  const visit=closed?points:points.concat(points.slice(0,-1).reverse());
+  route.splice(anchor+1,0,...visit,{...route[anchor]});
+ }
+ cache.set(id,route);return route.map(p=>({...p}));
+}
+const api={path,ids:Object.keys(drawings)};if(typeof module!=='undefined')module.exports=api;else root.OrbitIllustrations=api;
+})(globalThis);
+</script><script id="inlineContourWorker" type="text/plain">/* Orbit contour engine. Dependency-free; usable in a Web Worker or Node.js. */
 (function(root){
 'use strict';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -72,6 +241,7 @@ const api={grayscale,blur,otsu,adaptive,edges,morphology,removeSmall,trace,area,
 self.onmessage=({data})=>{try{const result=Contour.process(new Uint8ClampedArray(data.rgba),data.width,data.height,data.options);self.postMessage({id:data.id,result},[result.mask.buffer]);}catch(error){self.postMessage({id:data.id,error:error.message});}};
 </script><script>(function(root){
 'use strict';
+const Illustrations=typeof module!=='undefined'?require('./illustrations.js'):root.OrbitIllustrations;
 function resample(points,n=8192){
  const p=points.filter((v,i)=>!i||Math.hypot(v.x-points[i-1].x,v.y-points[i-1].y)>1e-7).map(p=>({...p}));
  if(p.length<3)throw Error('Draw a path containing at least three points.');
@@ -96,34 +266,38 @@ function at(c,t){let x=0,y=0;for(const v of c){const a=v.phase+2*Math.PI*v.f*t;x
 function error(p,c){return rms(p,reconstruct(c,p.length));}
 function moore(order=3){let s='LFL+F+LFL';for(let i=0;i<order;i++)s=[...s].map(c=>c==='L'?'-RF+LFL+FR-':c==='R'?'+LF-RFR-FL+':c).join('');let x=0,y=0,a=0,p=[{x,y}];for(const c of s){if(c==='+')a+=Math.PI/2;else if(c==='-')a-=Math.PI/2;else if(c==='F'){x+=Math.cos(a);y+=Math.sin(a);p.push({x,y});}}return p;}
 const presetCatalog=[
+ {id:'butterfly',label:'Monarch butterfly',category:'illustrations',description:'Layered wings, wing veins and eye spots. Try 511-1500 terms to reveal the engraving.'},
+ {id:'owl',label:'Engraved owl',category:'illustrations',description:'An owl with facial disks, curling eyes, layered wings and breast feathers.'},
+ {id:'koi',label:'Ornamental koi',category:'illustrations',description:'A curved koi fish with overlapping scales, flowing fins and whiskers.'},
+ {id:'seahorse',label:'Armored seahorse',category:'illustrations',description:'A curled tail, ridged armor, crown and delicate fin form a seahorse.'},
+ {id:'dragon',label:'Heraldic dragon',category:'illustrations',description:'A horned dragon with a ribbed wing, claws and a coiled tail.'},
+ {id:'stag',label:'Geometric stag',category:'illustrations',description:'A faceted deer portrait with branching antlers and angular facial planes.'},
+ {id:'lotus',label:'Lotus ornament',category:'illustrations',description:'Layered lotus petals, engraved veins and ornamental leaves.'},
+ {id:'scarab',label:'Winged scarab',category:'illustrations',description:'An Egyptian-inspired scarab with segmented wings, articulated legs and a sun disk.'},
+ {id:'star-17',label:'17-point star weave',category:'geometry',description:'A continuous 17/7 star polygon. Dense crossings and sharp tips reward more terms.'},
+ {id:'torus-knot',label:'Torus knot 9:16',category:'spirographs',description:'A planar projection of a 9:16 torus knot with interlaced radial loops.'},
+ {id:'guilloche',label:'Guilloche rosette',category:'spirographs',description:'A 24-lobed radius woven through seven turns, inspired by engraved security patterns.'},
+ {id:'koch-5',label:'Koch snowflake V',category:'fractals',description:'Five levels of triangular detail create 3072 edges along one closed fractal boundary.'},
  {id:'moore',label:'Moore curve',category:'fractals',description:'A continuous space-filling loop. More terms reveal its tight corners.'},
  {id:'heart',label:'Heart',category:'petals',description:'A classic heart made from a small set of trigonometric harmonics.'},
  {id:'flower',label:'Five-petal flower',category:'petals',description:'Five rounded petals on a softly modulated circle.'},
  {id:'star',label:'Star',category:'geometry',description:'A five-point star with alternating inner and outer corners.'},
  {id:'circle',label:'Circle',category:'geometry',description:'The simplest orbit: a single circular path.'},
- {id:'triangle',label:'Triangle',category:'geometry',description:'An equilateral triangle. Increase the terms to sharpen its vertices.'},
- {id:'square',label:'Square',category:'geometry',description:'Four equal sides, four right-angle corners.'},
- {id:'hexagon',label:'Hexagon',category:'geometry',description:'A regular six-sided polygon.'},
- {id:'octagon',label:'Octagon',category:'geometry',description:'A regular eight-sided polygon.'},
  {id:'pentagram',label:'Pentagram',category:'geometry',description:'Five crossing diagonals traced as one continuous star polygon.'},
- {id:'rounded-square',label:'Rounded square',category:'geometry',description:'A smooth superellipse between a circle and a square.'},
- {id:'rose-5',label:'Five-petal rose',category:'petals',description:'A polar rose whose five loops pass through the center.'},
  {id:'rose-8',label:'Eight-petal rose',category:'petals',description:'Eight radial loops woven into a single rose curve.'},
  {id:'infinity',label:'Infinity',category:'waves',description:'A flowing figure-eight loop with a crossing at the center.'},
- {id:'lissajous-32',label:'Lissajous 3:2',category:'waves',description:'Horizontal and vertical oscillations meet in a 3:2 frequency ratio.'},
  {id:'lissajous-45',label:'Lissajous 4:5',category:'waves',description:'A woven lattice from two perpendicular oscillations.'},
  {id:'lissajous-57',label:'Lissajous 5:7',category:'waves',description:'A denser oscillating knot with five and seven cycles.'},
- {id:'spiral',label:'Spiral ribbon',category:'waves',description:'A three-turn spiral with a return edge, forming one closed ribbon.'},
- {id:'astroid',label:'Astroid',category:'spirographs',description:'A four-cusp curve with gently concave sides.'},
- {id:'deltoid',label:'Deltoid',category:'spirographs',description:'A rounded triangular curve with three cusps.'},
- {id:'cardioid',label:'Cardioid',category:'spirographs',description:'A rolling-circle curve with one inward cusp.'},
- {id:'epitrochoid',label:'Outer spirograph',category:'spirographs',description:'A point on a circle rolling around the outside of another circle.'},
  {id:'hypotrochoid',label:'Inner spirograph',category:'spirographs',description:'An intricate looping path from a circle rolling inside another circle.'},
  {id:'koch',label:'Koch snowflake',category:'fractals',description:'Three iterations of triangular detail along a closed snowflake.'}
 ];
 function polygon(n,step=1,angle=-Math.PI/2){return Array.from({length:n},(_,i)=>({x:Math.cos(angle+2*Math.PI*i*step/n),y:Math.sin(angle+2*Math.PI*i*step/n)}));}
-function koch(){let p=polygon(3);for(let level=0;level<3;level++){const out=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length],dx=(b.x-a.x)/3,dy=(b.y-a.y)/3,u={x:a.x+dx,y:a.y+dy};out.push(a,u,{x:u.x+dx/2+dy*Math.sqrt(3)/2,y:u.y-dx*Math.sqrt(3)/2+dy/2},{x:a.x+2*dx,y:a.y+2*dy});}p=out;}return p;}
+function koch(levels=3){let p=polygon(3);for(let level=0;level<levels;level++){const out=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length],dx=(b.x-a.x)/3,dy=(b.y-a.y)/3,u={x:a.x+dx,y:a.y+dy};out.push(a,u,{x:u.x+dx/2+dy*Math.sqrt(3)/2,y:u.y-dx*Math.sqrt(3)/2+dy/2},{x:a.x+2*dx,y:a.y+2*dy});}p=out;}return p;}
 function preset(name){
+ if(Illustrations.ids.includes(name))return Illustrations.path(name);
+ if(name==='star-17')return polygon(17,7);
+ if(name==='koch-5')return koch(5);
+ if(name==='torus-knot'||name==='guilloche')return Array.from({length:4800},(_,i)=>{const t=2*Math.PI*i/4800,k=name==='torus-knot'?9:7,r=name==='torus-knot'?.68+.29*Math.cos(16*t):.72+.17*Math.cos(24*t)+.055*Math.cos(48*t);return{x:r*Math.cos(k*t),y:r*Math.sin(k*t)};});
  if(name==='moore')return moore(3);if(name==='koch')return koch();
  const sides={triangle:3,square:4,hexagon:6,octagon:8,pentagram:5};if(sides[name])return polygon(sides[name],name==='pentagram'?2:1,name==='square'?-Math.PI/4:-Math.PI/2);
  if(name==='star')return Array.from({length:10},(_,i)=>{const a=i*Math.PI/5-Math.PI/2,r=i%2?.42:1;return{x:r*Math.cos(a),y:r*Math.sin(a)};});
@@ -296,7 +470,7 @@ for(const b of document.querySelectorAll('[data-tab]'))b.onclick=()=>{for(const 
 const catalog=F.presetCatalog;let activePreset='moore';
 function choosePreset(id){const item=catalog.find(p=>p.id===id);if(!item)return;loadPoints(F.preset(id),item.label);activePreset=id;$('presetDescription').textContent=item.description;for(const b of document.querySelectorAll('[data-preset]')){const yes=b.dataset.preset===id;b.classList.toggle('selected',yes);b.setAttribute('aria-pressed',String(yes));}setPlay(true);}
 function filteredPresets(){const q=$('presetSearch').value.trim().toLowerCase(),category=$('presetCategory').value;return catalog.filter(p=>(category==='all'||p.category===category)&&(!q||(p.label+' '+p.description+' '+p.category).toLowerCase().includes(q)));}
-function renderPresets(){const items=filteredPresets(),grid=$('presetGrid');grid.replaceChildren();for(const item of items){const b=document.createElement('button');b.type='button';b.dataset.preset=item.id;b.classList.toggle('selected',item.id===activePreset);b.setAttribute('aria-pressed',String(item.id===activePreset));b.title=item.description;const canvas=document.createElement('canvas');canvas.width=160;canvas.height=120;canvas.setAttribute('aria-hidden','true');const label=document.createElement('span');label.textContent=item.label;b.append(canvas,label);const p=F.normalize(F.resample(F.preset(item.id),512));path(canvas.getContext('2d'),p,80,58,45,'#95cabb',1.7,p.length,true);b.onclick=()=>choosePreset(item.id);grid.append(b);}$('presetCount').textContent=items.length+' of '+catalog.length+' shapes';$('presetEmpty').hidden=!!items.length;$('randomPreset').disabled=!items.length;}
+function renderPresets(){const items=filteredPresets(),grid=$('presetGrid');grid.replaceChildren();for(const item of items){const b=document.createElement('button');b.type='button';b.dataset.preset=item.id;b.classList.toggle('selected',item.id===activePreset);b.setAttribute('aria-pressed',String(item.id===activePreset));b.title=item.description;const canvas=document.createElement('canvas');canvas.width=160;canvas.height=120;canvas.setAttribute('aria-hidden','true');const label=document.createElement('span');label.textContent=item.label;b.append(canvas,label);const p=F.normalize(F.resample(F.preset(item.id),item.category==='illustrations'?2048:1024));path(canvas.getContext('2d'),p,80,58,45,'#95cabb',1.7,p.length,true);b.onclick=()=>choosePreset(item.id);grid.append(b);}$('presetCount').textContent=items.length+' of '+catalog.length+' shapes';$('presetEmpty').hidden=!!items.length;$('randomPreset').disabled=!items.length;}
 $('presetSearch').addEventListener('input',renderPresets);$('presetCategory').addEventListener('change',renderPresets);
 $('randomPreset').onclick=()=>{const list=filteredPresets(),other=list.filter(p=>p.id!==activePreset),options=other.length?other:list;if(options.length)choosePreset(options[Math.floor(Math.random()*options.length)].id);};
 function clearPreset(){activePreset=null;for(const b of document.querySelectorAll('[data-preset]')){b.classList.remove('selected');b.setAttribute('aria-pressed','false');}$('presetDescription').textContent='Your custom path is active. Pick a shape to try something new.';}

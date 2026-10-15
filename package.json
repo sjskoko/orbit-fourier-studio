@@ -1,6 +1,6 @@
 {
   "name": "orbit-fourier-studio",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "description": "A browser-local Fourier studio with image contours, video exports and shareable stories.",
   "scripts": {

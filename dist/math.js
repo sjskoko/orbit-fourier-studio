@@ -1,5 +1,6 @@
 (function(root){
 'use strict';
+const Illustrations=typeof module!=='undefined'?require('./illustrations.js'):root.OrbitIllustrations;
 function resample(points,n=8192){
  const p=points.filter((v,i)=>!i||Math.hypot(v.x-points[i-1].x,v.y-points[i-1].y)>1e-7).map(p=>({...p}));
  if(p.length<3)throw Error('Draw a path containing at least three points.');
@@ -24,34 +25,38 @@ function at(c,t){let x=0,y=0;for(const v of c){const a=v.phase+2*Math.PI*v.f*t;x
 function error(p,c){return rms(p,reconstruct(c,p.length));}
 function moore(order=3){let s='LFL+F+LFL';for(let i=0;i<order;i++)s=[...s].map(c=>c==='L'?'-RF+LFL+FR-':c==='R'?'+LF-RFR-FL+':c).join('');let x=0,y=0,a=0,p=[{x,y}];for(const c of s){if(c==='+')a+=Math.PI/2;else if(c==='-')a-=Math.PI/2;else if(c==='F'){x+=Math.cos(a);y+=Math.sin(a);p.push({x,y});}}return p;}
 const presetCatalog=[
+ {id:'butterfly',label:'Monarch butterfly',category:'illustrations',description:'Layered wings, wing veins and eye spots. Try 511-1500 terms to reveal the engraving.'},
+ {id:'owl',label:'Engraved owl',category:'illustrations',description:'An owl with facial disks, curling eyes, layered wings and breast feathers.'},
+ {id:'koi',label:'Ornamental koi',category:'illustrations',description:'A curved koi fish with overlapping scales, flowing fins and whiskers.'},
+ {id:'seahorse',label:'Armored seahorse',category:'illustrations',description:'A curled tail, ridged armor, crown and delicate fin form a seahorse.'},
+ {id:'dragon',label:'Heraldic dragon',category:'illustrations',description:'A horned dragon with a ribbed wing, claws and a coiled tail.'},
+ {id:'stag',label:'Geometric stag',category:'illustrations',description:'A faceted deer portrait with branching antlers and angular facial planes.'},
+ {id:'lotus',label:'Lotus ornament',category:'illustrations',description:'Layered lotus petals, engraved veins and ornamental leaves.'},
+ {id:'scarab',label:'Winged scarab',category:'illustrations',description:'An Egyptian-inspired scarab with segmented wings, articulated legs and a sun disk.'},
+ {id:'star-17',label:'17-point star weave',category:'geometry',description:'A continuous 17/7 star polygon. Dense crossings and sharp tips reward more terms.'},
+ {id:'torus-knot',label:'Torus knot 9:16',category:'spirographs',description:'A planar projection of a 9:16 torus knot with interlaced radial loops.'},
+ {id:'guilloche',label:'Guilloche rosette',category:'spirographs',description:'A 24-lobed radius woven through seven turns, inspired by engraved security patterns.'},
+ {id:'koch-5',label:'Koch snowflake V',category:'fractals',description:'Five levels of triangular detail create 3072 edges along one closed fractal boundary.'},
  {id:'moore',label:'Moore curve',category:'fractals',description:'A continuous space-filling loop. More terms reveal its tight corners.'},
  {id:'heart',label:'Heart',category:'petals',description:'A classic heart made from a small set of trigonometric harmonics.'},
  {id:'flower',label:'Five-petal flower',category:'petals',description:'Five rounded petals on a softly modulated circle.'},
  {id:'star',label:'Star',category:'geometry',description:'A five-point star with alternating inner and outer corners.'},
  {id:'circle',label:'Circle',category:'geometry',description:'The simplest orbit: a single circular path.'},
- {id:'triangle',label:'Triangle',category:'geometry',description:'An equilateral triangle. Increase the terms to sharpen its vertices.'},
- {id:'square',label:'Square',category:'geometry',description:'Four equal sides, four right-angle corners.'},
- {id:'hexagon',label:'Hexagon',category:'geometry',description:'A regular six-sided polygon.'},
- {id:'octagon',label:'Octagon',category:'geometry',description:'A regular eight-sided polygon.'},
  {id:'pentagram',label:'Pentagram',category:'geometry',description:'Five crossing diagonals traced as one continuous star polygon.'},
- {id:'rounded-square',label:'Rounded square',category:'geometry',description:'A smooth superellipse between a circle and a square.'},
- {id:'rose-5',label:'Five-petal rose',category:'petals',description:'A polar rose whose five loops pass through the center.'},
  {id:'rose-8',label:'Eight-petal rose',category:'petals',description:'Eight radial loops woven into a single rose curve.'},
  {id:'infinity',label:'Infinity',category:'waves',description:'A flowing figure-eight loop with a crossing at the center.'},
- {id:'lissajous-32',label:'Lissajous 3:2',category:'waves',description:'Horizontal and vertical oscillations meet in a 3:2 frequency ratio.'},
  {id:'lissajous-45',label:'Lissajous 4:5',category:'waves',description:'A woven lattice from two perpendicular oscillations.'},
  {id:'lissajous-57',label:'Lissajous 5:7',category:'waves',description:'A denser oscillating knot with five and seven cycles.'},
- {id:'spiral',label:'Spiral ribbon',category:'waves',description:'A three-turn spiral with a return edge, forming one closed ribbon.'},
- {id:'astroid',label:'Astroid',category:'spirographs',description:'A four-cusp curve with gently concave sides.'},
- {id:'deltoid',label:'Deltoid',category:'spirographs',description:'A rounded triangular curve with three cusps.'},
- {id:'cardioid',label:'Cardioid',category:'spirographs',description:'A rolling-circle curve with one inward cusp.'},
- {id:'epitrochoid',label:'Outer spirograph',category:'spirographs',description:'A point on a circle rolling around the outside of another circle.'},
  {id:'hypotrochoid',label:'Inner spirograph',category:'spirographs',description:'An intricate looping path from a circle rolling inside another circle.'},
  {id:'koch',label:'Koch snowflake',category:'fractals',description:'Three iterations of triangular detail along a closed snowflake.'}
 ];
 function polygon(n,step=1,angle=-Math.PI/2){return Array.from({length:n},(_,i)=>({x:Math.cos(angle+2*Math.PI*i*step/n),y:Math.sin(angle+2*Math.PI*i*step/n)}));}
-function koch(){let p=polygon(3);for(let level=0;level<3;level++){const out=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length],dx=(b.x-a.x)/3,dy=(b.y-a.y)/3,u={x:a.x+dx,y:a.y+dy};out.push(a,u,{x:u.x+dx/2+dy*Math.sqrt(3)/2,y:u.y-dx*Math.sqrt(3)/2+dy/2},{x:a.x+2*dx,y:a.y+2*dy});}p=out;}return p;}
+function koch(levels=3){let p=polygon(3);for(let level=0;level<levels;level++){const out=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length],dx=(b.x-a.x)/3,dy=(b.y-a.y)/3,u={x:a.x+dx,y:a.y+dy};out.push(a,u,{x:u.x+dx/2+dy*Math.sqrt(3)/2,y:u.y-dx*Math.sqrt(3)/2+dy/2},{x:a.x+2*dx,y:a.y+2*dy});}p=out;}return p;}
 function preset(name){
+ if(Illustrations.ids.includes(name))return Illustrations.path(name);
+ if(name==='star-17')return polygon(17,7);
+ if(name==='koch-5')return koch(5);
+ if(name==='torus-knot'||name==='guilloche')return Array.from({length:4800},(_,i)=>{const t=2*Math.PI*i/4800,k=name==='torus-knot'?9:7,r=name==='torus-knot'?.68+.29*Math.cos(16*t):.72+.17*Math.cos(24*t)+.055*Math.cos(48*t);return{x:r*Math.cos(k*t),y:r*Math.sin(k*t)};});
  if(name==='moore')return moore(3);if(name==='koch')return koch();
  const sides={triangle:3,square:4,hexagon:6,octagon:8,pentagram:5};if(sides[name])return polygon(sides[name],name==='pentagram'?2:1,name==='square'?-Math.PI/4:-Math.PI/2);
  if(name==='star')return Array.from({length:10},(_,i)=>{const a=i*Math.PI/5-Math.PI/2,r=i%2?.42:1;return{x:r*Math.cos(a),y:r*Math.sin(a)};});
