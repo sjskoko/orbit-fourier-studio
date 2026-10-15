@@ -26,3 +26,9 @@ Browser-level encoding, device share sheets and Instagram import were not tested
 3. Deterministic offline browser encoding with WebCodecs and a bundled MP4 muxer, after measuring mobile support and bundle cost. Current browser export is real-time.
 4. A custom domain for an account-independent sharing URL. GitHub Pages exposes the repository owner's public handle.
 5. Physical Android Chrome and iPhone Safari checks for file downloads, native sharing and Instagram ingestion.
+
+## Version 1.3 additions
+
+- Added 24 shape presets with searchable thumbnails, five families, and random selection within the active filter.
+- Added voluntary GitHub Star links in the studio header, support card, completed-video panel and Story page, with a short sign-in-and-star explanation.
+- New preset tests verify finite normalized paths, Fourier convergence and 5,000-term reconstruction for every shape, including the spiral ribbon and fractal boundary.

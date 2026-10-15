@@ -23,7 +23,54 @@ function rms(p,q){let e=0,b=0,mx=p.reduce((s,v)=>s+v.x,0)/p.length,my=p.reduce((
 function at(c,t){let x=0,y=0;for(const v of c){const a=v.phase+2*Math.PI*v.f*t;x+=v.amp*Math.cos(a);y+=v.amp*Math.sin(a);}return{x,y};}
 function error(p,c){return rms(p,reconstruct(c,p.length));}
 function moore(order=3){let s='LFL+F+LFL';for(let i=0;i<order;i++)s=[...s].map(c=>c==='L'?'-RF+LFL+FR-':c==='R'?'+LF-RFR-FL+':c).join('');let x=0,y=0,a=0,p=[{x,y}];for(const c of s){if(c==='+')a+=Math.PI/2;else if(c==='-')a-=Math.PI/2;else if(c==='F'){x+=Math.cos(a);y+=Math.sin(a);p.push({x,y});}}return p;}
-function preset(name){if(name==='moore')return moore(3);return Array.from({length:600},(_,i)=>{const t=2*Math.PI*i/600;if(name==='heart')return{x:16*Math.sin(t)**3,y:-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))};if(name==='flower'){const r=.65+.3*Math.cos(5*t);return{x:r*Math.cos(t),y:r*Math.sin(t)};}if(name==='star'){const a=Math.floor(i/60),f=i/60-a,r=a%2?.42:1,r2=a%2?1:.42;return{x:r*Math.cos(a*Math.PI/5-Math.PI/2)*(1-f)+r2*Math.cos((a+1)*Math.PI/5-Math.PI/2)*f,y:r*Math.sin(a*Math.PI/5-Math.PI/2)*(1-f)+r2*Math.sin((a+1)*Math.PI/5-Math.PI/2)*f};}return{x:Math.cos(t),y:Math.sin(t)};});}
+const presetCatalog=[
+ {id:'moore',label:'Moore curve',category:'fractals',description:'A continuous space-filling loop. More terms reveal its tight corners.'},
+ {id:'heart',label:'Heart',category:'petals',description:'A classic heart made from a small set of trigonometric harmonics.'},
+ {id:'flower',label:'Five-petal flower',category:'petals',description:'Five rounded petals on a softly modulated circle.'},
+ {id:'star',label:'Star',category:'geometry',description:'A five-point star with alternating inner and outer corners.'},
+ {id:'circle',label:'Circle',category:'geometry',description:'The simplest orbit: a single circular path.'},
+ {id:'triangle',label:'Triangle',category:'geometry',description:'An equilateral triangle. Increase the terms to sharpen its vertices.'},
+ {id:'square',label:'Square',category:'geometry',description:'Four equal sides, four right-angle corners.'},
+ {id:'hexagon',label:'Hexagon',category:'geometry',description:'A regular six-sided polygon.'},
+ {id:'octagon',label:'Octagon',category:'geometry',description:'A regular eight-sided polygon.'},
+ {id:'pentagram',label:'Pentagram',category:'geometry',description:'Five crossing diagonals traced as one continuous star polygon.'},
+ {id:'rounded-square',label:'Rounded square',category:'geometry',description:'A smooth superellipse between a circle and a square.'},
+ {id:'rose-5',label:'Five-petal rose',category:'petals',description:'A polar rose whose five loops pass through the center.'},
+ {id:'rose-8',label:'Eight-petal rose',category:'petals',description:'Eight radial loops woven into a single rose curve.'},
+ {id:'infinity',label:'Infinity',category:'waves',description:'A flowing figure-eight loop with a crossing at the center.'},
+ {id:'lissajous-32',label:'Lissajous 3:2',category:'waves',description:'Horizontal and vertical oscillations meet in a 3:2 frequency ratio.'},
+ {id:'lissajous-45',label:'Lissajous 4:5',category:'waves',description:'A woven lattice from two perpendicular oscillations.'},
+ {id:'lissajous-57',label:'Lissajous 5:7',category:'waves',description:'A denser oscillating knot with five and seven cycles.'},
+ {id:'spiral',label:'Spiral ribbon',category:'waves',description:'A three-turn spiral with a return edge, forming one closed ribbon.'},
+ {id:'astroid',label:'Astroid',category:'spirographs',description:'A four-cusp curve with gently concave sides.'},
+ {id:'deltoid',label:'Deltoid',category:'spirographs',description:'A rounded triangular curve with three cusps.'},
+ {id:'cardioid',label:'Cardioid',category:'spirographs',description:'A rolling-circle curve with one inward cusp.'},
+ {id:'epitrochoid',label:'Outer spirograph',category:'spirographs',description:'A point on a circle rolling around the outside of another circle.'},
+ {id:'hypotrochoid',label:'Inner spirograph',category:'spirographs',description:'An intricate looping path from a circle rolling inside another circle.'},
+ {id:'koch',label:'Koch snowflake',category:'fractals',description:'Three iterations of triangular detail along a closed snowflake.'}
+];
+function polygon(n,step=1,angle=-Math.PI/2){return Array.from({length:n},(_,i)=>({x:Math.cos(angle+2*Math.PI*i*step/n),y:Math.sin(angle+2*Math.PI*i*step/n)}));}
+function koch(){let p=polygon(3);for(let level=0;level<3;level++){const out=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length],dx=(b.x-a.x)/3,dy=(b.y-a.y)/3,u={x:a.x+dx,y:a.y+dy};out.push(a,u,{x:u.x+dx/2+dy*Math.sqrt(3)/2,y:u.y-dx*Math.sqrt(3)/2+dy/2},{x:a.x+2*dx,y:a.y+2*dy});}p=out;}return p;}
+function preset(name){
+ if(name==='moore')return moore(3);if(name==='koch')return koch();
+ const sides={triangle:3,square:4,hexagon:6,octagon:8,pentagram:5};if(sides[name])return polygon(sides[name],name==='pentagram'?2:1,name==='square'?-Math.PI/4:-Math.PI/2);
+ if(name==='star')return Array.from({length:10},(_,i)=>{const a=i*Math.PI/5-Math.PI/2,r=i%2?.42:1;return{x:r*Math.cos(a),y:r*Math.sin(a)};});
+ if(name==='spiral'){const p=[];for(const side of [1,-1])for(let j=0;j<720;j++){const u=(side===1?j:719-j)/719,t=6*Math.PI*u,r=.14+.78*u+side*.035;p.push({x:r*Math.cos(t),y:r*Math.sin(t)});}return p;}
+ return Array.from({length:1200},(_,i)=>{const t=2*Math.PI*i/1200;
+  if(name==='heart')return{x:16*Math.sin(t)**3,y:-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))};
+  if(name==='flower'){const r=.65+.3*Math.cos(5*t);return{x:r*Math.cos(t),y:r*Math.sin(t)};}
+  if(name==='rounded-square'){const c=Math.cos(t),s=Math.sin(t);return{x:Math.sign(c)*Math.abs(c)**.5,y:Math.sign(s)*Math.abs(s)**.5};}
+  if(name==='rose-5'||name==='rose-8'){const a=name==='rose-5'?t/2:t,k=name==='rose-5'?5:4,r=Math.cos(k*a);return{x:r*Math.cos(a),y:r*Math.sin(a)};}
+  if(name==='infinity')return{x:Math.cos(t),y:.5*Math.sin(2*t)};
+  if(name.startsWith('lissajous-')){const pair={'lissajous-32':[3,2],'lissajous-45':[4,5],'lissajous-57':[5,7]}[name];if(pair)return{x:Math.sin(pair[0]*t+(name==='lissajous-45'?Math.PI/4:Math.PI/2)),y:Math.sin(pair[1]*t)};}
+  if(name==='astroid')return{x:Math.cos(t)**3,y:Math.sin(t)**3};
+  if(name==='deltoid')return{x:2*Math.cos(t)+Math.cos(2*t),y:2*Math.sin(t)-Math.sin(2*t)};
+  if(name==='cardioid')return{x:2*Math.cos(t)-Math.cos(2*t),y:2*Math.sin(t)-Math.sin(2*t)};
+  if(name==='epitrochoid')return{x:4*Math.cos(t)-1.7*Math.cos(4*t),y:4*Math.sin(t)-1.7*Math.sin(4*t)};
+  if(name==='hypotrochoid'){const a=t*3;return{x:2*Math.cos(a)+3.5*Math.cos(2*a/3),y:2*Math.sin(a)-3.5*Math.sin(2*a/3)};}
+  return{x:Math.cos(t),y:Math.sin(t)};
+ });
+}
 // Directed pixel-cell boundary edges: stitch closed outer and inner contours.
 function contours(data,w,h,threshold=128,invert=false){const on=new Uint8Array(w*h);for(let i=0;i<on.length;i++){const a=data[i*4+3]/255,g=(.2126*data[i*4]+.7152*data[i*4+1]+.0722*data[i*4+2])*a+255*(1-a);on[i]=invert?g>threshold:g<threshold;}
  const edges=new Map(),key=(x,y)=>y*(w+1)+x,add=(x,y,xx,yy)=>{const k=key(x,y);if(!edges.has(k))edges.set(k,[]);edges.get(k).push(key(xx,yy));};
@@ -31,5 +78,5 @@ function contours(data,w,h,threshold=128,invert=false){const on=new Uint8Array(w
  const out=[];while(edges.size){const start=edges.keys().next().value;let k=start,p=[],guard=0;do{p.push({x:k%(w+1),y:Math.floor(k/(w+1))});const next=edges.get(k);if(!next)break;const q=next.pop();if(!next.length)edges.delete(k);k=q;}while(k!==start&&guard++<w*h*8);if(k===start&&p.length>12)out.push(p);}
  return out.sort((a,b)=>b.length-a.length).slice(0,40);
 }
-const api={resample,normalize,fft,dft,select,at,error,rms,reconstruct,reconstruction,preset,contours};if(typeof module!=='undefined')module.exports=api;else root.Fourier=api;
+const api={resample,normalize,fft,dft,select,at,error,rms,reconstruct,reconstruction,preset,presetCatalog,contours};if(typeof module!=='undefined')module.exports=api;else root.Fourier=api;
 })(globalThis);

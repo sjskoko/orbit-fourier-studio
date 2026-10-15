@@ -14,6 +14,8 @@ Draw a path or upload an image, refine its contour, and animate it with up to 5,
 
 ## Features
 
+- **24 shape presets:** polygons, polar roses, Lissajous curves, spirographs, a closed spiral ribbon and fractals, with thumbnail previews, search, family filters and a Surprise me button.
+
 - **Draw your own path** with a mouse, touch screen or stylus; undo and clear strokes.
 - **Upload an image** and inspect candidate contours before animating one.
 - **Advanced contour lab:** automatic background polarity, Otsu and adaptive thresholds, alpha silhouettes, Canny-style photo edges, noise reduction and morphological cleanup.
@@ -25,6 +27,24 @@ Draw a path or upload an image, refine its contour, and animate it with up to 5,
 - **Video export:** 9:16 story, 1:1 square or 16:9 landscape; 720p/1080p; 6/15/30 seconds; MP4 when available, with a clearly labeled WebM fallback.
 - **Story landing page:** a ready-to-share MP4, mobile layout, file sharing, link copying and Instagram Link sticker instructions.
 - All image and sketch processing happens locally. There are no analytics, image-upload endpoints, API keys or runtime dependencies.
+
+## Explore the shape library
+
+Use **Presets** to search by name or filter by family. Select a thumbnail to animate it, or use **Surprise me** to choose another shape from the current results. Your Fourier term count and colors are preserved. Custom drawings and image contours clear the preset highlight.
+
+| Family | Shapes |
+| --- | --- |
+| Geometry | Circle, triangle, square, hexagon, octagon, star, pentagram, rounded square |
+| Flowers & hearts | Heart, five-petal flower, five-petal rose, eight-petal rose |
+| Waves & spirals | Infinity, Lissajous 3:2, 4:5 and 5:7, spiral ribbon |
+| Spirographs | Astroid, deltoid, cardioid, outer and inner spirographs |
+| Fractals | Moore curve, Koch snowflake |
+
+The spiral follows both edges of a narrow ribbon so it remains a closed path. High term counts reveal corners and fine detail in polygon and fractal presets.
+
+## Support Orbit
+
+If you enjoy the studio, [open the repository and click **☆ Star**](https://github.com/sjskoko/orbit-fourier-studio). GitHub may ask you to sign in. The studio, completed-video panel and Story page all provide a direct link with these steps. Starring is voluntary and has no effect on access to features. The app does not access a GitHub account, submit stars automatically or display unverified star counts.
 
 ## Video export
 
